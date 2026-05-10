@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Base theme used by the single Activity. Compose Material3 theme is applied in Kotlin. -->
+<resources>
+    <style name="Theme.AlphaDragon" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/surface_black</item>
+        <item name="android:navigationBarColor">@color/surface_black</item>
+        <item name="android:windowBackground">@color/surface_black</item>
+        <item name="android:windowTranslucentStatus">false</item>
+    </style>
+</resources>

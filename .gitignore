@@ -1,0 +1,58 @@
+# ========================
+# Android / Gradle
+# ========================
+*.iml
+.gradle/
+build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Local SDK path — machine-specific, never commit
+local.properties
+
+# Android Studio generated
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# ========================
+# Secrets / Keys
+# ========================
+*.jks
+*.keystore
+*.p12
+*.pem
+google-services.json
+# API keys, signing configs, and environment overrides
+secrets.properties
+signing.properties
+
+# ========================
+# macOS
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V7
+.Trashes
+
+# ========================
+# Cursor IDE
+# ========================
+# Keep: .cursor/plans/ (project plans are source-controlled)
+# Keep: .cursor/rules/ (coding rules are source-controlled)
+# Ignore editor state / caches
+.cursor/*.json
+.cursor/settings/
+
+# ========================
+# Misc
+# ========================
+*.log
+*.tmp
+*.bak
+out/

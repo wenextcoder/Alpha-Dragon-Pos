@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/common" />
+            <option value="$PROJECT_DIR$/core/payment-interface" />
+            <option value="$PROJECT_DIR$/core/testing" />
+            <option value="$PROJECT_DIR$/merchant" />
+            <option value="$PROJECT_DIR$/merchant/cardnet" />
+            <option value="$PROJECT_DIR$/merchant/clover" />
+            <option value="$PROJECT_DIR$/merchant/elavon" />
+            <option value="$PROJECT_DIR$/merchant/firstdata" />
+            <option value="$PROJECT_DIR$/merchant/fiserv" />
+            <option value="$PROJECT_DIR$/merchant/manya" />
+            <option value="$PROJECT_DIR$/merchant/worldpay" />
+            <option value="$PROJECT_DIR$/terminal" />
+            <option value="$PROJECT_DIR$/terminal/castles" />
+            <option value="$PROJECT_DIR$/terminal/clover-flex" />
+            <option value="$PROJECT_DIR$/terminal/ingenico" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

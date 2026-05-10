@@ -1,0 +1,5 @@
+# Copy this file to local.properties and fill in your local Android SDK path.
+# DO NOT commit local.properties — it is in .gitignore.
+# No secrets belong here. All API keys are stored in Android Keystore at runtime.
+
+sdk.dir=/path/to/your/android/sdk

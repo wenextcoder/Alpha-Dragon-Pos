@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Alpha Dragon</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Welcome to Alpha Dragon</string>
+    <string name="setup_subtitle">Let\'s set up your POS</string>
+    <string name="setup_shop_name_hint">Shop name</string>
+    <string name="setup_admin_name_hint">Your full name</string>
+    <string name="setup_username_hint">Username (no spaces)</string>
+    <string name="setup_pin_hint">6-digit PIN</string>
+    <string name="setup_pin_confirm_hint">Confirm PIN</string>
+    <string name="setup_cta">Create Admin Account</string>
+
+    <!-- Login screen -->
+    <string name="login_username_hint">Username</string>
+    <string name="login_pin_hint">PIN</string>
+    <string name="login_cta">Login</string>
+    <string name="login_locked">Account locked. Try again in %d seconds.</string>
+
+    <!-- Sale screen -->
+    <string name="sale_search_hint">Search products…</string>
+    <string name="sale_cart_empty">Cart is empty</string>
+    <string name="sale_add_customer">Add customer (optional)</string>
+    <string name="sale_pay_cash">Cash</string>
+    <string name="sale_pay_card">Card</string>
+    <string name="sale_pay_split">Split</string>
+    <string name="sale_offline_card_msg">No internet connection. Card payments unavailable. Accept cash or retry when connected.</string>
+
+    <!-- Common -->
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="back">Back</string>
+    <string name="loading">Loading…</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="pin_entry_title">Enter PIN to continue</string>
+</resources>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- allowBackup="false" in manifest is the primary safeguard.
+     This file suppresses the lint warning. No data is ever backed up. -->
+<full-backup-content />

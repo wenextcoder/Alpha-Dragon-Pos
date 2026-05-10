@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Blocks all plain HTTP traffic. Merchant APIs must use HTTPS/TLS 1.2+.
+    Certificate pinning is enforced per-client in OkHttp CertificatePinner.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <!-- Debug builds may need to trust user-added CAs for Charles/mitmproxy -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
