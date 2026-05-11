@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.alphadragon.pos.data.local.AlphaDragonDb
 import com.alphadragon.pos.data.local.MIGRATION_1_2
+import com.alphadragon.pos.data.local.MIGRATION_2_3
+import com.alphadragon.pos.data.local.MIGRATION_3_4
 import com.alphadragon.pos.security.KeystoreManager
 import com.alphadragon.core.common.AppConfig
 import dagger.Module
@@ -36,7 +38,7 @@ object DatabaseModule {
             AppConfig.DB_NAME
         )
             .openHelperFactory(factory)
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .fallbackToDestructiveMigration() // dev safety net: wipes and recreates on hash mismatch
             .build()
     }
@@ -45,6 +47,7 @@ object DatabaseModule {
     @Provides fun provideAdminDao(db: AlphaDragonDb) = db.adminDao()
     @Provides fun provideCategoryDao(db: AlphaDragonDb) = db.categoryDao()
     @Provides fun provideProductDao(db: AlphaDragonDb) = db.productDao()
+    @Provides fun provideCustomerDao(db: AlphaDragonDb) = db.customerDao()
     @Provides fun provideTransactionDao(db: AlphaDragonDb) = db.transactionDao()
     @Provides fun provideTransactionItemDao(db: AlphaDragonDb) = db.transactionItemDao()
     @Provides fun provideRefundDao(db: AlphaDragonDb) = db.refundDao()

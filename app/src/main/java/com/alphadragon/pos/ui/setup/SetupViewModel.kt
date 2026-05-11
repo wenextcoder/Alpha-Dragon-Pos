@@ -2,10 +2,14 @@ package com.alphadragon.pos.ui.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alphadragon.core.common.ConfigKeys
+import com.alphadragon.pos.domain.repository.AppConfigRepository
 import com.alphadragon.pos.domain.usecase.auth.LoginResult
 import com.alphadragon.pos.domain.usecase.auth.LoginUseCase
 import com.alphadragon.pos.domain.usecase.auth.SessionManager
 import com.alphadragon.pos.domain.usecase.auth.SetupAdminUseCase
+import com.alphadragon.pos.ui.currency.DEFAULT_CURRENCY_CODE
+import com.alphadragon.pos.ui.currency.isSupportedCurrencyCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +24,7 @@ data class SetupUiState(
     val shopName: String = "",
     val adminName: String = "",
     val username: String = "",
+    val currencyCode: String = DEFAULT_CURRENCY_CODE,
     val pin: String = "",
     val pinConfirm: String = ""
 )
@@ -28,7 +33,8 @@ data class SetupUiState(
 class SetupViewModel @Inject constructor(
     private val setupAdminUseCase: SetupAdminUseCase,
     private val loginUseCase: LoginUseCase,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val appConfigRepository: AppConfigRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SetupUiState())
@@ -37,6 +43,11 @@ class SetupViewModel @Inject constructor(
     fun updateShopName(value: String) { _uiState.value = _uiState.value.copy(shopName = value, errorMessage = null) }
     fun updateAdminName(value: String) { _uiState.value = _uiState.value.copy(adminName = value, errorMessage = null) }
     fun updateUsername(value: String) { _uiState.value = _uiState.value.copy(username = value.filter { !it.isWhitespace() }, errorMessage = null) }
+    fun updateCurrency(value: String) {
+        if (isSupportedCurrencyCode(value)) {
+            _uiState.value = _uiState.value.copy(currencyCode = value, errorMessage = null)
+        }
+    }
     fun updatePin(value: String) { _uiState.value = _uiState.value.copy(pin = value, errorMessage = null) }
     fun updatePinConfirm(value: String) { _uiState.value = _uiState.value.copy(pinConfirm = value, errorMessage = null) }
 
@@ -52,7 +63,17 @@ class SetupViewModel @Inject constructor(
                 pin = state.pin,
                 pinConfirm = state.pinConfirm
             ).fold(
-                onSuccess = { autoLogin(state.pin) },
+                onSuccess = {
+                    appConfigRepository.set(ConfigKeys.SHOP_CURRENCY, state.currencyCode).fold(
+                        onSuccess = { autoLogin(state.pin) },
+                        onFailure = { error ->
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = error.message ?: "Could not save currency"
+                            )
+                        }
+                    )
+                },
                 onFailure = {
                     _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = it.message ?: "Setup failed")
                 }

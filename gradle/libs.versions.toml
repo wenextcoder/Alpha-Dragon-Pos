@@ -1,17 +1,19 @@
 [versions]
-agp = "8.13.2"
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.27"
+agp = "9.2.1"
+kotlin = "2.3.21"
+ksp = "2.3.7"
 compose-bom = "2024.06.00"
 activity-compose = "1.9.3"
 navigation-compose = "2.8.4"
-hilt = "2.51.1"
+hilt = "2.59.2"
 hilt-navigation-compose = "1.2.0"
-room = "2.6.1"
+room = "2.8.4"
 sqlcipher = "4.5.4"
 sqlite = "2.4.0"
 lifecycle = "2.8.7"
 coroutines = "1.9.0"
+camera = "1.6.1"
+mlkit-barcode = "17.3.0"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
 coil = "2.7.0"
@@ -88,6 +90,13 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # Image
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+# Camera + barcode scanning
+camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camera" }
+camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camera" }
+camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camera" }
+camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camera" }
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkit-barcode" }
+
 # Security
 jbcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "jbcrypt" }
 rootbeer = { group = "com.scottyab", name = "rootbeer-lib", version.ref = "rootbeer" }
@@ -115,5 +124,6 @@ compose = ["compose-ui", "compose-ui-graphics", "compose-ui-tooling-preview", "c
 lifecycle = ["lifecycle-viewmodel-ktx", "lifecycle-viewmodel-compose", "lifecycle-runtime-ktx", "lifecycle-runtime-compose"]
 retrofit = ["retrofit-core", "retrofit-kotlinx-serialization", "okhttp-core"]
 room = ["room-runtime", "room-ktx"]
+camera = ["camera-core", "camera-camera2", "camera-lifecycle", "camera-view"]
 testing-unit = ["junit", "mockk", "coroutines-test", "turbine"]
 testing-android = ["junit-ext", "espresso-core", "mockk-android", "compose-ui-test-junit4"]

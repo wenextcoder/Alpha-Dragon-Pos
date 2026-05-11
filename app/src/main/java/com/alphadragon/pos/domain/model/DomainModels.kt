@@ -13,6 +13,7 @@ data class Admin(
 data class Product(
     val id: String,
     val name: String,
+    val description: String? = null,
     val sku: String? = null,
     val barcode: String? = null,
     val categoryId: String? = null,
@@ -37,6 +38,17 @@ data class Category(
     val taxRate: Double? = null,
     val displayOrder: Int = 0,
     val isActive: Boolean = true
+)
+
+/** Saved customer for quick lookup and marketing (optional; receipts still store snapshot on each sale). */
+data class Customer(
+    val id: String,
+    val name: String,
+    val phone: String,
+    val email: String? = null,
+    val note: String? = null,
+    val createdAt: Long,
+    val updatedAt: Long
 )
 
 /** Cart item — transient, lives in ViewModel only until payment confirmed. */
