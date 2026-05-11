@@ -23,3 +23,12 @@
 
 6. **Phase 1 done**
    - Offline flow works end-to-end: setup → sale → stored transaction → reporting, with security controls enabled.
+
+
+
+Add Bottom Nav Bar to the app
+on the home screen keep  widget : 2 col [Today Sales,] [Today Order]
+
+1 row growth chart,
+menu
+

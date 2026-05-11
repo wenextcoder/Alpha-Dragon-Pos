@@ -18,6 +18,17 @@ local.properties
 .idea/workspace.xml
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
+.idea/vcs.xml
+.idea/deploymentTargetSelector.xml
+.idea/inspectionProfiles/
+
+# Kotlin / KSP
+.kotlin/
+
+# Built artifacts (never commit)
+*.apk
+*.aab
+*.ap_
 
 # ========================
 # Secrets / Keys
@@ -56,3 +67,7 @@ signing.properties
 *.tmp
 *.bak
 out/
+
+# Env / local tooling
+.env
+.env.*
