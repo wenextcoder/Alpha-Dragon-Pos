@@ -58,6 +58,7 @@ data class CategoryEntity(
 data class ProductEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "description") val description: String? = null,
     @ColumnInfo(name = "sku") val sku: String? = null,
     @ColumnInfo(name = "barcode") val barcode: String? = null,
     @ColumnInfo(name = "category_id") val categoryId: String? = null,
@@ -184,4 +185,21 @@ data class AuditLogEntity(
     @ColumnInfo(name = "action") val action: String,
     @ColumnInfo(name = "detail") val detail: String? = null,  // JSON with action-specific context
     @ColumnInfo(name = "timestamp") val timestamp: Long
+)
+
+@Entity(
+    tableName = "customers",
+    indices = [
+        Index("phone"),
+        Index("name")
+    ]
+)
+data class CustomerEntity(
+    @PrimaryKey val id: String,
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "phone") val phone: String,
+    @ColumnInfo(name = "email") val email: String? = null,
+    @ColumnInfo(name = "note") val note: String? = null,
+    @ColumnInfo(name = "created_at") val createdAt: Long,
+    @ColumnInfo(name = "updated_at") val updatedAt: Long
 )

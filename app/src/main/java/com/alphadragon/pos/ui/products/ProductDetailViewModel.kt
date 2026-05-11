@@ -21,6 +21,7 @@ data class ProductDetailUiState(
     val isSaved: Boolean = false,
     val errorMessage: String? = null,
     val name: String = "",
+    val description: String = "",
     val price: String = "",
     val sku: String = "",
     val barcode: String = "",
@@ -43,7 +44,9 @@ class ProductDetailViewModel @Inject constructor(
     private val imageStorage: ProductImageStorage
 ) : ViewModel() {
 
-    private val productId: String? = savedStateHandle["productId"]
+    private val productId: String? = savedStateHandle.get<String>("productId")?.takeIf { it.isNotEmpty() }
+    private val barcodeArg: String? = savedStateHandle.get<String>("barcode")
+        ?.takeIf { it.isNotBlank() && it != "{barcode}" }
 
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
@@ -61,6 +64,7 @@ class ProductDetailViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isEditMode = true,
                         name = product.name,
+                        description = product.description.orEmpty(),
                         price = product.price.toString(),
                         sku = product.sku ?: "",
                         barcode = product.barcode ?: "",
@@ -72,13 +76,19 @@ class ProductDetailViewModel @Inject constructor(
                     )
                 }
             }
+        } else {
+            val prefillBarcode = barcodeArg?.trim()?.takeIf { it.isNotEmpty() }
+            if (prefillBarcode != null) {
+                _uiState.value = _uiState.value.copy(barcode = prefillBarcode)
+            }
         }
     }
 
     fun updateName(v: String) { _uiState.value = _uiState.value.copy(name = v, errorMessage = null) }
+    fun updateDescription(v: String) { _uiState.value = _uiState.value.copy(description = v) }
     fun updatePrice(v: String) { _uiState.value = _uiState.value.copy(price = v, errorMessage = null) }
     fun updateSku(v: String) { _uiState.value = _uiState.value.copy(sku = v) }
-    fun updateBarcode(v: String) { _uiState.value = _uiState.value.copy(barcode = v) }
+    fun updateBarcode(v: String) { _uiState.value = _uiState.value.copy(barcode = v.trim(), errorMessage = null) }
     fun updateCategoryId(v: String?) { _uiState.value = _uiState.value.copy(categoryId = v) }
     fun updateTaxRate(v: String) { _uiState.value = _uiState.value.copy(taxRate = v) }
     fun updateTrackStock(v: Boolean) { _uiState.value = _uiState.value.copy(trackStock = v) }
@@ -125,28 +135,51 @@ class ProductDetailViewModel @Inject constructor(
             _uiState.value = state.copy(errorMessage = "Invalid tax rate")
             return
         }
-        _uiState.value = state.copy(isLoading = true, errorMessage = null)
-        val now = System.currentTimeMillis()
-        val product = Product(
-            id = productId ?: UUID.randomUUID().toString(),
-            name = state.name,
-            sku = state.sku.takeIf { it.isNotBlank() },
-            barcode = state.barcode.takeIf { it.isNotBlank() },
-            categoryId = state.categoryId,
-            price = price,
-            taxRate = taxRate,
-            imagePath = state.imagePath,
-            trackStock = state.trackStock,
-            stockQty = state.stockQty.toIntOrNull() ?: 0,
-            createdAt = now,
-            updatedAt = now
-        )
+        val barcodeTrim = state.barcode.trim()
+        if (barcodeTrim.isNotBlank() && !barcodeTrim.isValidBarcodeValue()) {
+            _uiState.value = state.copy(errorMessage = "Barcode must be 4-64 letters, numbers, or barcode-safe symbols")
+            return
+        }
         viewModelScope.launch {
+            if (barcodeTrim.isNotBlank()) {
+                val existing = productRepository.getProductByBarcode(barcodeTrim)
+                val usedByOther = existing != null && (productId == null || existing.id != productId)
+                if (usedByOther) {
+                    _uiState.value = state.copy(
+                        errorMessage = "This barcode is already used by \"${existing.name}\". Use a different code or clear the field."
+                    )
+                    return@launch
+                }
+            }
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            val now = System.currentTimeMillis()
+            val product = Product(
+                id = productId ?: UUID.randomUUID().toString(),
+                name = state.name,
+                description = state.description.trim().takeIf { it.isNotBlank() },
+                sku = state.sku.takeIf { it.isNotBlank() },
+                barcode = barcodeTrim.takeIf { it.isNotBlank() },
+                categoryId = state.categoryId,
+                price = price,
+                taxRate = taxRate,
+                imagePath = state.imagePath,
+                trackStock = state.trackStock,
+                stockQty = state.stockQty.toIntOrNull() ?: 0,
+                createdAt = now,
+                updatedAt = now
+            )
             val result = if (state.isEditMode) updateProductUseCase(product) else saveProductUseCase(product)
             result.fold(
                 onSuccess = { _uiState.value = _uiState.value.copy(isLoading = false, isSaved = true) },
                 onFailure = { _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = it.message) }
             )
         }
+    }
+
+    private fun String.isValidBarcodeValue(): Boolean {
+        if (length !in 4..64) return false
+        return any { it.isLetterOrDigit() } &&
+            none { it.isISOControl() } &&
+            all { it.isLetterOrDigit() || it in "-_.:/ " }
     }
 }

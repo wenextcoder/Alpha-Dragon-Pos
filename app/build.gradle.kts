@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
@@ -9,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.alphadragon.pos"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.alphadragon.pos"
@@ -53,10 +52,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
         buildConfig = true
@@ -71,6 +66,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // JUnit 5 jars each embed META-INF/LICENSE.md — merge needs a single winner
+            pickFirsts += "META-INF/LICENSE.md"
         }
     }
 }
@@ -114,6 +111,10 @@ dependencies {
 
     // Image loading
     implementation(libs.coil.compose)
+
+    // Camera barcode scanning
+    implementation(libs.bundles.camera)
+    implementation(libs.mlkit.barcode.scanning)
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)

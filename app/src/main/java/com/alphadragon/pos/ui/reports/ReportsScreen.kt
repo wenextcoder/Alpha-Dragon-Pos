@@ -12,8 +12,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alphadragon.pos.ui.components.AlphaDragonTopBar
+import com.alphadragon.pos.ui.currency.rememberCurrencyFormatter
 import com.alphadragon.pos.ui.theme.BrandRed
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,7 +24,7 @@ fun ReportsScreen(
     viewModel: ReportsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val fmt = NumberFormat.getCurrencyInstance()
+    val fmt = rememberCurrencyFormatter()
     val dateFmt = remember { SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault()) }
     val todayMidnight = remember {
         val cal = java.util.Calendar.getInstance()

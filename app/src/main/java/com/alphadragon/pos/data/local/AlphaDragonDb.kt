@@ -13,6 +13,32 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS customers (
+                id TEXT NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT,
+                note TEXT,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+            )
+            """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_customers_phone ON customers(phone)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_customers_name ON customers(name)")
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE products ADD COLUMN description TEXT")
+    }
+}
+
 @Database(
     entities = [
         AppConfigEntity::class,
@@ -26,8 +52,9 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         TerminalConfigEntity::class,
         TaxRuleEntity::class,
         AuditLogEntity::class,
+        CustomerEntity::class,
     ],
-    version = 2,
+    version = 4,
     exportSchema = true
 )
 abstract class AlphaDragonDb : RoomDatabase() {
@@ -35,6 +62,7 @@ abstract class AlphaDragonDb : RoomDatabase() {
     abstract fun adminDao(): AdminDao
     abstract fun categoryDao(): CategoryDao
     abstract fun productDao(): ProductDao
+    abstract fun customerDao(): CustomerDao
     abstract fun transactionDao(): TransactionDao
     abstract fun transactionItemDao(): TransactionItemDao
     abstract fun refundDao(): RefundDao

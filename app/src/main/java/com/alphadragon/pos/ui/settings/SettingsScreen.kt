@@ -12,11 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.alphadragon.pos.ui.components.AlphaDragonTopBar
+import com.alphadragon.pos.ui.currency.SupportedCurrencies
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit
+    onBack: (() -> Unit)? = null,
+    onShopProfile: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val view = LocalView.current
     val window = (view.context as? android.app.Activity)?.window
@@ -25,16 +29,73 @@ fun SettingsScreen(
         onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
     }
 
-    Scaffold(topBar = { AlphaDragonTopBar("Settings", onBack = onBack) }) { padding ->
+    val state by viewModel.uiState.collectAsState()
+    var showCurrencyPicker by remember { mutableStateOf(false) }
+
+    if (showCurrencyPicker) {
+        AlertDialog(
+            onDismissRequest = { showCurrencyPicker = false },
+            title = { Text("Shop currency") },
+            text = {
+                Column {
+                    SupportedCurrencies.forEach { currencyCode ->
+                        ListItem(
+                            headlineContent = { Text(currencyCode) },
+                            trailingContent = {
+                                if (currencyCode == state.currencyCode) {
+                                    Icon(Icons.Default.Check, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.updateCurrency(currencyCode)
+                                    showCurrencyPicker = false
+                                }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showCurrencyPicker = false }) { Text("Close") }
+            }
+        )
+    }
+
+    Scaffold(
+        topBar = { AlphaDragonTopBar("Settings", onBack = onBack) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
                 SettingsGroup("Shop") {
-                    SettingsItem(icon = Icons.Default.Store, title = "Shop Profile", subtitle = "Name, logo, address, currency") {}
+                    SettingsItem(
+                        icon = Icons.Default.Store,
+                        title = "Shop Profile",
+                        subtitle = "Name, logo, address, currency",
+                        onClick = onShopProfile
+                    )
+                    SettingsItem(
+                        icon = Icons.Default.AttachMoney,
+                        title = "Currency",
+                        subtitle = state.currencyCode,
+                        onClick = { showCurrencyPicker = true }
+                    )
                     SettingsItem(icon = Icons.Default.Receipt, title = "Receipt Template", subtitle = "Header, footer, field visibility") {}
                     SettingsItem(icon = Icons.Default.Percent, title = "Tax Rules", subtitle = "Global rate and category overrides") {}
+                }
+            }
+            if (state.errorMessage != null) {
+                item {
+                    Text(
+                        text = state.errorMessage ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
                 }
             }
             item {

@@ -39,6 +39,14 @@ interface ProductRepository {
     suspend fun deactivateCategory(id: String): Result<Unit>
 }
 
+interface CustomerRepository {
+    fun observeAll(): Flow<List<Customer>>
+    suspend fun getById(id: String): Customer?
+    suspend fun insert(customer: Customer): Result<Unit>
+    suspend fun update(customer: Customer): Result<Unit>
+    suspend fun delete(id: String): Result<Unit>
+}
+
 interface TransactionRepository {
     fun observeAll(): Flow<List<Transaction>>
     fun observeByDateRange(from: Long, to: Long): Flow<List<Transaction>>

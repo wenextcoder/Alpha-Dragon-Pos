@@ -25,19 +25,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.alphadragon.pos.domain.model.Product
 import com.alphadragon.pos.ui.components.AlphaDragonTopBar
+import com.alphadragon.pos.ui.currency.rememberCurrencyFormatter
 import com.alphadragon.pos.ui.theme.BrandRed
 import com.alphadragon.pos.ui.theme.SurfaceContainer
 import com.alphadragon.pos.R
+import java.text.NumberFormat
 
 @Composable
 fun ProductListScreen(
     onAddProduct: () -> Unit,
     onProductClick: (String) -> Unit,
     onManageCategories: () -> Unit,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)? = null,
     viewModel: ProductListViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val currency = rememberCurrencyFormatter()
 
     if (state.deleteConfirmProductId != null) {
         AlertDialog(
@@ -80,7 +83,8 @@ fun ProductListScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add product")
             }
-        }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             OutlinedTextField(
@@ -118,9 +122,13 @@ fun ProductListScreen(
             }
 
             if (state.products.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No products found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                ProductsEmptyState(
+                    allProductsEmpty = state.allProducts.isEmpty(),
+                    hasCategoryFilter = state.selectedCategoryId != null,
+                    hasSearchQuery = state.searchQuery.isNotBlank(),
+                    noProductsInCategory = state.selectedCategoryId != null &&
+                        state.allProducts.isNotEmpty()
+                )
             } else if (state.isGridView) {
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                     val cols = (maxWidth / 160.dp).toInt().coerceAtLeast(2)
@@ -134,6 +142,7 @@ fun ProductListScreen(
                         items(state.products, key = { it.id }) { product ->
                             ProductGridCard(
                                 product = product,
+                                currency = currency,
                                 onClick = { onProductClick(product.id) },
                                 onDelete = { viewModel.requestDeleteConfirm(product.id) }
                             )
@@ -149,12 +158,72 @@ fun ProductListScreen(
                     items(state.products, key = { it.id }) { product ->
                         ProductListCard(
                             product = product,
+                            currency = currency,
                             onClick = { onProductClick(product.id) },
                             onDelete = { viewModel.requestDeleteConfirm(product.id) }
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ProductsEmptyState(
+    allProductsEmpty: Boolean,
+    hasCategoryFilter: Boolean,
+    hasSearchQuery: Boolean,
+    noProductsInCategory: Boolean
+) {
+    val (title, message, icon) = when {
+        noProductsInCategory && hasCategoryFilter ->
+            Triple(
+                "No matches",
+                "Try a different Category or Search",
+                Icons.Default.Category
+            )
+        hasSearchQuery && allProductsEmpty ->
+            Triple(
+                "No matches",
+                "Try a different name, SKU, or barcode.",
+                Icons.Default.Search
+            )
+        else ->
+            Triple(
+                "No products yet",
+                "Tap + to add your first product.",
+                Icons.Default.Inventory
+            )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(56.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -180,10 +249,10 @@ fun ProductImage(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Default.ImageNotSupported,
+                painter = painterResource(id = R.drawable.placeholder_image),
                 contentDescription = "No image",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(48.dp)
             )
         }
     }
@@ -192,7 +261,12 @@ fun ProductImage(
 // ── Grid card ────────────────────────────────────────────────────────────────
 
 @Composable
-private fun ProductGridCard(product: Product, onClick: () -> Unit, onDelete: () -> Unit) {
+private fun ProductGridCard(
+    product: Product,
+    currency: NumberFormat,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -245,7 +319,7 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit, onDelete: () 
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "£%.2f".format(product.price),
+                            currency.format(product.price),
                             style = MaterialTheme.typography.titleSmall,
                             color = BrandRed,
                             fontWeight = FontWeight.Bold
@@ -283,7 +357,12 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit, onDelete: () 
 // ── List card ────────────────────────────────────────────────────────────────
 
 @Composable
-private fun ProductListCard(product: Product, onClick: () -> Unit, onDelete: () -> Unit) {
+private fun ProductListCard(
+    product: Product,
+    currency: NumberFormat,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -328,7 +407,7 @@ private fun ProductListCard(product: Product, onClick: () -> Unit, onDelete: () 
                     Text(detail, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("£%.2f".format(product.price), style = MaterialTheme.typography.titleSmall, color = BrandRed, fontWeight = FontWeight.Bold)
+                    Text(currency.format(product.price), style = MaterialTheme.typography.titleSmall, color = BrandRed, fontWeight = FontWeight.Bold)
                     if (product.isLowStock) {
                         Badge(containerColor = MaterialTheme.colorScheme.error) { Text("Low stock") }
                     }

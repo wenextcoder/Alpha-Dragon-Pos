@@ -3,13 +3,12 @@ package com.alphadragon.pos.domain.usecase.report
 import com.alphadragon.pos.domain.model.DailySummary
 import com.alphadragon.pos.domain.repository.TransactionRepository
 import java.util.Calendar
-import java.util.TimeZone
 import javax.inject.Inject
 
 class GetDailySummaryUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
 ) {
-    /** Returns today's summary using UTC midnight boundaries. */
+    /** Returns the summary for the **local calendar day** containing [dateMillis] (device timezone). */
     suspend operator fun invoke(dateMillis: Long = System.currentTimeMillis()): Result<DailySummary> =
         runCatching {
             val (start, end) = dayBoundaries(dateMillis)
@@ -17,7 +16,7 @@ class GetDailySummaryUseCase @Inject constructor(
         }
 
     private fun dayBoundaries(millis: Long): Pair<Long, Long> {
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val cal = Calendar.getInstance()
         cal.timeInMillis = millis
         cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)

@@ -2,7 +2,6 @@ package com.alphadragon.pos.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -36,23 +36,8 @@ fun PinBlockInput(
     val focusRequester = remember { FocusRequester() }
 
     Box(modifier = modifier) {
-        // Hidden field — captures keyboard, invisible to user
-        androidx.compose.foundation.text.BasicTextField(
-            value = value,
-            onValueChange = { input ->
-                if (input.length <= pinLength && input.all { it.isDigit() }) onValueChange(input)
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier
-                .size(1.dp)
-                .focusRequester(focusRequester)
-        )
-
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { focusRequester.requestFocus() },
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             repeat(pinLength) { index ->
@@ -101,6 +86,20 @@ fun PinBlockInput(
                 }
             }
         }
+
+        // Overlay: same size as PIN row so taps focus this field and open the keyboard
+        androidx.compose.foundation.text.BasicTextField(
+            value = value,
+            onValueChange = { input ->
+                if (input.length <= pinLength && input.all { it.isDigit() }) onValueChange(input)
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier
+                .matchParentSize()
+                .alpha(0f)
+                .focusRequester(focusRequester)
+        )
     }
 
     LaunchedEffect(Unit) {

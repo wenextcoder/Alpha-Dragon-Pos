@@ -70,7 +70,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     // Mapping helpers
     private fun ProductEntity.toDomain() = Product(
-        id = id, name = name, sku = sku, barcode = barcode,
+        id = id, name = name, description = description, sku = sku, barcode = barcode,
         categoryId = categoryId, price = price, taxRate = taxRate,
         imagePath = imagePath, trackStock = trackStock, stockQty = stockQty,
         lowStockAlert = lowStockAlert, isActive = isActive,
@@ -78,7 +78,7 @@ class ProductRepositoryImpl @Inject constructor(
     )
 
     private fun Product.toEntity() = ProductEntity(
-        id = id, name = name, sku = sku, barcode = barcode,
+        id = id, name = name, description = description, sku = sku, barcode = barcode,
         categoryId = categoryId, price = price, taxRate = taxRate,
         imagePath = imagePath, trackStock = trackStock, stockQty = stockQty,
         lowStockAlert = lowStockAlert, isActive = isActive,
